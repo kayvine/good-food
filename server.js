@@ -1,24 +1,23 @@
 import express, { json, urlencoded } from 'express';
-import { PORT } from './configuration/configuration';
+import { PORT } from './config/config';
 import cors from 'cors';
 import Authentication from './middleware/Authentication';
 import mongoose from 'mongoose';
 import authRoutes from './authentication/auth.route';
-import userRoutes from './users/api/users.route';
+import userRoutes from './users/users.route';
 
 var app = express();
 
 app.use(cors());
 
 // JWT Authentication for security
-app.use(Authentication);
+// app.use(Authentication);
 
-// Normal express config defaultsrs
 app.use(json());
 app.use(urlencoded({ extended: false }));
 
 // connect to mongodb (Should be in config)
-mongoose.connect('mongodb://localhost/goodfood', { useMongoClient: true });
+mongoose.connect('mongodb://localhost/goodfood', { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => console.log('Connected to database...'));
@@ -26,7 +25,6 @@ db.once('open', () => console.log('Connected to database...'));
 // Get routes
 authRoutes(app);
 userRoutes(app);
-
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -51,13 +49,6 @@ app.use(function (err, req, res, next) {
     }
   });
 });
-
-// if (production) {
-//   app.use((err, req, res, next) => {
-//     // Some other way to handle error handling
-//   })
-// }
-
 
 // Let's start our server...
 app.listen(PORT, () => { console.log(`Listening on port ${PORT}`) });
