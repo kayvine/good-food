@@ -1,5 +1,5 @@
 import { createUser, getUserById, getUsers } from './user.service';
-import { isValidForCreation } from '../validators/UserValidator';
+import { isValidForCreation } from '../validators/user.validator';
 
 export default (router) => {
 
@@ -18,8 +18,7 @@ export default (router) => {
     router.post('/users', isValidForCreation, (req, res) => {
         createUser(req.body)
             .then(data => res.status(201).send(data))
-            .catch(error => res.status(500).send({ stack: error.stack }));
+            .catch(error => res.status(400).send({ error: error.message }));
     });
 
 };
-

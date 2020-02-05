@@ -11,8 +11,9 @@ var app = express();
 app.use(cors());
 
 // JWT Authentication for security
-// app.use(Authentication);
+app.use(Authentication({ whitelist: ['/authentication'] }));
 
+// add req.body to Express
 app.use(json());
 app.use(urlencoded({ extended: false }));
 

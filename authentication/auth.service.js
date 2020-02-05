@@ -1,9 +1,17 @@
 import { compare } from "bcryptjs"
-import User from "../users/user.model"
+import { sign } from "jsonwebtoken";
+import { SECRET } from "../config/config";
+import { findByEmail } from "../users/user.service"
 
-export const authenticate = ({ email, password }) => {
-    // get user by email .then() check password
-    User.findByEmail(email).then(user => {
-        compare(password, user.password)
-    })
+export const authenticate = async ({ email, password }) => {
+    const user = await findByEmail(email);
+    if (!user) { throw Error('User not found!') }
+    const value = await compare(password, user.password);
+    if (value) {
+        user.permissions = [];
+        delete user.password;
+        return sign(user, SECRET);
+    } else {
+        throw Error('The provided password is incorrect!');
+    }
 }

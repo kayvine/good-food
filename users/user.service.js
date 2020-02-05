@@ -1,28 +1,40 @@
 import { hash } from 'bcryptjs';
-import CrudRepository from '../core/crudRepository';
 import User from './user.model';
+import CRUD from '../core/crudRepository';
+import UserRepository from './user.repository';
 
 // Pass along model to CRUD repository only once
-const UserRepository = CrudRepository(User);
+const CrudRepository = CRUD(User);
 
-export const getUsers = UserRepository.getAll;
+// export const getUsers = CrudRepository.getAll;
 
-export const getUserById = UserRepository.getById;
+// export const getUserById = CrudRepository.getById;
 
-export const createUser = (user) => {
+export const findByEmail = UserRepository.findByEmail;
 
-    return hash(user.password, 2).then((hashed) => {
+export const userExists = async (user) => {
+    const value = await findByEmail(user.email);
+    return value ? true : false;
+}
+
+export const createUser = async (user) => {
+    try {
+        const hashed = await hash(user.password, 2);
         user.password = hashed;
-
-        return UserRepository.create(user);
-    });
+        return CrudRepository.create(user);
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
 };
 
-export const updateUser = (user) => {
-    return getUserById(user.id).then((old) => {
-        user.password = old.password;
-        return UserRepository.update(user);
-    });
-};
+// export const updateUser = async (user) => {
 
-export const removeUser = UserRepository.remove;
+//     User.findById(user.id).then((old) => {
+//         user.password = old.password;
+// return user.update see mongoose
+//     return UserRepository.update(user);
+// });
+// };
+
+// export const removeUser = CrudRepository.remove;
