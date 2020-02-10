@@ -6,9 +6,9 @@ import UserRepository from './user.repository';
 // Pass along model to CRUD repository only once
 const CrudRepository = CRUD(User);
 
-// export const getUsers = CrudRepository.getAll;
+export const getUsers = CrudRepository.getAll;
 
-// export const getUserById = CrudRepository.getById;
+export const getUserById = CrudRepository.getById;
 
 export const findByEmail = UserRepository.findByEmail;
 
@@ -17,24 +17,51 @@ export const userExists = async (user) => {
     return value ? true : false;
 }
 
-export const createUser = async (user) => {
+export const createUser = async (requestor, user) => {
+    console.log('requestor', requestor)
     try {
+        if (user.name.first && user.name.last && !user.name.handle) {
+            user.name.handle = user.name.last.substring(0, 4) + user.name.first.substring(0, 2);
+        }
         const hashed = await hash(user.password, 2);
         user.password = hashed;
-        return CrudRepository.create(user);
+        user.createdOn = Date.now();
+        user.createdBy = requestor._id;
+        const newUser = await CrudRepository.create(user);
+        delete newUser.password;
+        // console.log('new user', newUser);
+        return newUser;
     } catch (err) {
         console.error(err);
         throw err;
     }
 };
 
-// export const updateUser = async (user) => {
+export const updateUser = async (requestor, id, user) => {
+    try {
+        if (user.password) {
+            const hashed = await hash(user.password, 2);
+            user.password = hashed;
+        }
+        user.lastModifiedOn = Date.now(); // use moment.js
+        user.lastModifiedBy = requestor.toString();
+        // console.log('id', id);
+        // console.log('user', user);
+        return CrudRepository.update(id, user);
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+};
 
-//     User.findById(user.id).then((old) => {
-//         user.password = old.password;
-// return user.update see mongoose
-//     return UserRepository.update(user);
-// });
+// export const removeUser = async (requestor, id) => {
+//     try {
+//         const user = await getUserById(id);
+//         user.deletedOn = Date.now();
+//         user.deletedBy = requestor.toString();
+//         return CrudRepository.update(id, user);
+//     } catch (err) {
+//         console.error(err);
+//         throw err;
+//     }
 // };
-
-// export const removeUser = CrudRepository.remove;

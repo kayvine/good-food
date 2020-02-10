@@ -1,12 +1,18 @@
-export const getAll = (model) => () => model.find().exec();
+import { toObject, listToObject } from "./database.helpers";
 
-export const getById = (model) => (id) => model.findById(id).exec();
+export const getAll = (model) => () => model.find().then(listToObject);
 
-export const create = (model) => (item) => model.create(item);
+export const getById = (model) => (id) => model.findById(id).exec(toObject);
 
-export const update = (model) => (item) => model.findOneAndUpdate({ _id: item.id }, item).exec();
+export const create = (model) => (item) => model.create(item).then(toObject);
 
-export const remove = (model) => (id) => model.findById(id).remove();
+export const update = (model) => (id, item) => {
+    return model.findOneAndUpdate({ _id: id }, item, { new: true })
+        .exec()
+        .then(toObject)
+};
+
+export const remove = (model) => (id) => model.remove({ _id: id });
 
 // Abstract wrapper to add new functionality only once 
 export default (model) => ({

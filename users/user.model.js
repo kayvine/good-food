@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import baseSchema from '../core/baseSchema';
+import { baseSchema } from '../core/baseSchema';
 
 const userSchema = {
     name: {
@@ -9,7 +9,7 @@ const userSchema = {
     },
     email: String, // used for authentication
     password: String, // encrypted of course (bcrypt)
-    role: [String], // EMPLOYEE, SYSTEM, USER, COOK, whatever you want as roles
+    roles: [String], // EMPLOYEE, SYSTEM, USER, COOK, whatever you want as roles
     ...baseSchema
 };
 

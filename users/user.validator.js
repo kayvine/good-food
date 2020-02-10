@@ -1,4 +1,4 @@
-import { userExists } from "../users/user.service";
+import { userExists } from "./user.service";
 /**
  * For the name of the user, the first or lastname are only required if 
  * the handle is not filled in and vice versa. If first and last are filled in, 
@@ -9,11 +9,7 @@ export const isValidForCreation = async (req, res, next) => {
     const { name, email, password, role } = req.body;
     const errors = [];
 
-    if (name.first && name.last && !name.handle) {
-        name.handle = name.last.substring(0, 4) + name.first.substring(0, 2);
-    }
-
-    if ((name.first || name.last) && !name.handle) {
+    if (!(name.first || name.last) && !name.handle) {
         errors.push({ level: 'error', code: 'USR0001', message: 'Either fullname or handle is mandatory' });
     }
 
@@ -27,7 +23,7 @@ export const isValidForCreation = async (req, res, next) => {
 
     const exists = await userExists(req.body);
     if (exists) {
-        errors.push({ level: 'error', code: 'USR0010', message: `A user with email ${email} already exists` });
+        errors.push({ level: 'error', code: 'USR0004', message: `A user with email ${email} already exists` });
     }
 
     if (errors.length > 0) {
@@ -39,24 +35,24 @@ export const isValidForCreation = async (req, res, next) => {
 };
 
 export const isValidForEditing = (req, res, next) => {
-    // const user = req.body;
-    // const errors = [];
+    const user = req.body;
+    const errors = [];
 
-    // if (req.user.id !== req.params.id) {
-    //     errors.push({ level: 'error', code: 'USR0004', message: 'You cheecky bastard, trying to change someone elses stuff' });
-    // }
+    if (!req.params.id) {
+        errors.push({ level: 'error', code: 'USR0010', message: 'No id!!!' });
+    }
 
-    // if (!user.username) {
-    //     errors.push({ level: 'error', code: 'USR0005', message: 'username is mandatory' });
-    // }
+    if (!user.name) {
+        errors.push({ level: 'error', code: 'USR0011', message: 'name is mandatory' });
+    }
 
-    // if (!user.email) {
-    //     errors.push({ level: 'error', code: 'USR0006', message: 'email is mandatory' });
-    // }
+    if (!user.email) {
+        errors.push({ level: 'error', code: 'USR0012', message: 'email is mandatory' });
+    }
 
-    // if (errors.length > 0) {
-    //     res.status(400).send(errors);
-    // } else {
-    //     next();
-    // }
+    if (errors.length > 0) {
+        res.status(400).send(errors);
+    } else {
+        next();
+    }
 };

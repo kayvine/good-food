@@ -1,4 +1,5 @@
 import { verify } from 'jsonwebtoken';
+import { SECRET } from '../config/config';
 
 export default ({ whitelist }) => (req, res, next) => {
 
@@ -13,10 +14,11 @@ export default ({ whitelist }) => (req, res, next) => {
             const token = AuthorizationHeader.split(' ')[1];
 
             // verify token
-            verify(token, process.env.SECRET, (err, decoded) => {
+            verify(token, SECRET, (err, decoded) => {
                 if (err) {
                     res.status(401).send({ message: "token validation failed" });
                 } else {
+                    // console.log(decoded);
                     req.user = decoded;
                     next();
                 }

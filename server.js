@@ -4,7 +4,8 @@ import cors from 'cors';
 import Authentication from './middleware/Authentication';
 import mongoose from 'mongoose';
 import authRoutes from './authentication/auth.route';
-import userRoutes from './users/users.route';
+import userRoutes from './users/user.route';
+import productRoutes from './products/product.route';
 
 var app = express();
 
@@ -18,7 +19,7 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 
 // connect to mongodb (Should be in config)
-mongoose.connect('mongodb://localhost/goodfood', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost/goodfood', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => console.log('Connected to database...'));
@@ -26,6 +27,7 @@ db.once('open', () => console.log('Connected to database...'));
 // Get routes
 authRoutes(app);
 userRoutes(app);
+app.use('/products', productRoutes);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
