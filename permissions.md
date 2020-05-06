@@ -2,32 +2,46 @@
 
 Users are the people, roles are their functions, and permissions define what authorizations those functions have.
 
-## Permissions
+## :memo: Permissions
 
-Forget about roles when writing code
-All you need to know is the permission you need to do something.
+Forget about roles when writing code.
+All you need to know is the permission you need in order to do something.
 
 ```javascript
-router.post('/users', isValidForCreation, createUser(req.user, req.body)
+// You need permission to see a list of all users
+router.get('/users', hasPermission('GET_USERS'), getAllUsers());
+
+// You need to be the owner or have permission to see your profile
+router.get(
+  '/users/:id',
+  isOwnerOrHasPermission('GET_USER'),
+  getUserById(req.params.id)
+);
 ```
 
-Naming convension: VERB + RESOURCE + CONDITION
+> Naming convension: VERB + RESOURCE (+ CONDITION)
 
 Can be stored in JSON format:
 
 ```json
 {
-  "ADMIN": ["GET_USER", "EDIT_USER", "DELETE_USER"],
-  "EMPLOYEE": ["GET_USER"],
+  "ADMIN": ["GET_USERS", "GET_USER", "EDIT_USER", "DELETE_USER"],
+  "EMPLOYEE": ["GET_USER", "EDIT_USER"],
   "USER": []
 }
+```
+
+```javascript
+import Mapping from '../permissions.json';
+
+export const getPermissionFromRole = (role) => Mapping[role] || [];
 ```
 
 ## :oncoming_police_car: Authentication
 
 When authenticating the user we put the permissions on the req.user.
 
-> get user roles => map to permissions =>
+> get user roles => map to permissions => put on token/session/..
 
 ```javascript
 export const authenticate = async ({ email, password }) => {
@@ -45,8 +59,7 @@ export const authenticate = async ({ email, password }) => {
       ...user,
     };
     // Get permissions from role and add to jwt payload
-    payload.permissions =
-      !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
+    payload.permissions = user.roles.map(getPermissionFromRole);
     return sign(payload, SECRET);
   } catch (err) {
     console.error(err);
@@ -55,11 +68,6 @@ export const authenticate = async ({ email, password }) => {
 };
 ```
 
-## Forget about roles when writing code
+## :beginner: More
 
-All you need to know is the permission you need to do something.
-
-```javascript
-var s = 'JavaScript syntax highlighting';
-alert(s);
-```
+https://gist.github.com/facultymatt/6370903
