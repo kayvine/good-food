@@ -19,15 +19,19 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 
 // connect to mongodb (Should be in config)
-mongoose.connect('mongodb://localhost/goodfood', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
+mongoose.connect('mongodb://localhost/goodfood', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => console.log('Connected to database...'));
 
 // Get routes
-authRoutes(app);
-userRoutes(app);
+app.use('/authentication', authRoutes);
 app.use('/products', productRoutes);
+userRoutes(app);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -46,12 +50,14 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
 
   res.json({
-    'errors': {
+    errors: {
       message: err.message,
-      error: err
-    }
+      error: err,
+    },
   });
 });
 
 // Let's start our server...
-app.listen(PORT, () => { console.log(`Listening on port ${PORT}`) });
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
