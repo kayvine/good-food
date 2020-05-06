@@ -4,19 +4,14 @@ Users are the people, roles are their functions, and permissions define what aut
 
 ## :memo: Permissions
 
-Forget about roles when writing code.
-All you need to know is the permission you need in order to do something.
+Forget about roles when writing code. All you need to know is the permission you need in order to do something.
 
 ```javascript
 // You need permission to see a list of all users
 router.get('/users', hasPermission('GET_USERS'), getAllUsers());
 
 // You need to be the owner or have permission to see your profile
-router.get(
-  '/users/:id',
-  isOwnerOrHasPermission('GET_USER'),
-  getUserById(req.params.id)
-);
+router.get('/users/:id', isOwnerOrHasPermission('GET_USER'), getUserById(req.params.id));
 ```
 
 > Naming convension: VERB + RESOURCE (+ CONDITION)
@@ -59,7 +54,7 @@ export const authenticate = async ({ email, password }) => {
       ...user,
     };
     // Get permissions from role and add to jwt payload
-    payload.permissions = user.roles.map(getPermissionFromRole);
+    payload.permissions = !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
     return sign(payload, SECRET);
   } catch (err) {
     console.error(err);

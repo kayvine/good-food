@@ -17,8 +17,7 @@ export const authenticate = async ({ email, password }) => {
         ...user,
       };
       // Get permissions
-      payload.permissions =
-        !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
+      payload.permissions = !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
       //log
       console.log('user.roles', user.roles);
       console.log('permissions', payload.permissions);
