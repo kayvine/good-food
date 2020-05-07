@@ -6,6 +6,7 @@ import { getPermissionFromRole } from '../core/roles';
 
 export const authenticate = async ({ email, password }) => {
   try {
+    console.log(email, password)
     const user = await User.findByEmail(email);
     if (!user) {
       throw Error('User not found!');
@@ -17,8 +18,7 @@ export const authenticate = async ({ email, password }) => {
         ...user,
       };
       // Get permissions
-      payload.permissions =
-        !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
+      payload.permissions = !user.roles === [] ? user.roles.map(getPermissionFromRole) : [];
       //log
       console.log('user.roles', user.roles);
       console.log('permissions', payload.permissions);

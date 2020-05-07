@@ -16,7 +16,7 @@ export default ({ whitelist }) => (req, res, next) => {
         if (err) {
           res.status(401).send({ message: 'token validation failed' });
         } else {
-          // console.log(decoded);
+          console.log(decoded);
           req.user = decoded;
           next();
         }

@@ -12,7 +12,7 @@ var app = express();
 app.use(cors());
 
 // JWT Authentication for security
-app.use(Authentication({ whitelist: ['/authentication'] }));
+// app.use(Authentication({ whitelist: ['/authentication'] }));
 
 // add req.body to Express
 app.use(json());
@@ -50,9 +50,9 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
 
   res.json({
-    errors: {
+    error: {
       message: err.message,
-      error: err,
+      status: err.status
     },
   });
 });
