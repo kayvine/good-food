@@ -11,6 +11,7 @@ export const getUserById = CrudRepository.getById;
 
 export const userExists = async (user) => {
   const value = await User.findByEmail(user.email);
+  console.log('value', value);
   return value ? true : false;
 };
 
@@ -18,12 +19,10 @@ export const createUser = async (requestor, user) => {
   console.log('requestor', requestor);
   try {
     if (user.name.first && user.name.last && !user.name.handle) {
-      user.name.handle =
-        user.name.last.substring(0, 4) + user.name.first.substring(0, 2);
+      user.name.handle = user.name.last.substring(0, 4) + user.name.first.substring(0, 2);
     }
-    const hashed = await hash(user.password, 2);
+    const hashed = await hash(user.password, 8);
     user.password = hashed;
-    // user.createdOn = Date.now();
     user.createdBy = requestor ? requestor._id : null;
     const newUser = await User.create(user);
     delete newUser.password;
@@ -38,11 +37,11 @@ export const createUser = async (requestor, user) => {
 export const updateUser = async (requestor, id, user) => {
   try {
     if (user.password) {
-      const hashed = await hash(user.password, 2);
+      const hashed = await hash(user.password, 8);
       user.password = hashed;
     }
     user.lastModifiedOn = Date.now(); // use moment.js
-    user.lastModifiedBy = requestor.toString();
+    user.lastModifiedBy = requestor ? requestor._id : null;
     // console.log('id', id);
     // console.log('user', user);
     return CrudRepository.update(id, user);

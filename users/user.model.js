@@ -17,4 +17,8 @@ userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email });
 };
 
+// userSchema.statics.findByName = function(name, callback) {
+//   return this.model.find({ name: name }, callback);
+// }
+
 export default model('User', userSchema);

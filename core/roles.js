@@ -7,4 +7,4 @@ const Mapping = {
   USER: [],
 };
 
-export const getPermissionFromRole = (role) => Mapping[role] || [];
+export const getPermissionsFromRole = (role) => Mapping[role] || [];

@@ -1,22 +1,12 @@
 import express, { json, urlencoded } from 'express';
 import { PORT } from './config/config';
 import cors from 'cors';
-import Authentication from './middleware/Authentication';
+import authentication from './middleware/authentication';
 import mongoose from 'mongoose';
 import authRoutes from './authentication/auth.route';
 import userRoutes from './users/user.route';
 import productRoutes from './products/product.route';
-
-var app = express();
-
-app.use(cors());
-
-// JWT Authentication for security
-app.use(Authentication({ whitelist: ['/authentication'] }));
-
-// add req.body to Express
-app.use(json());
-app.use(urlencoded({ extended: false }));
+// import orderRoutes from './orders/order.route';
 
 // connect to mongodb (Should be in config)
 mongoose.connect('mongodb://localhost/goodfood', {
@@ -28,31 +18,43 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => console.log('Connected to database...'));
 
+var app = express();
+
+app.use(cors());
+
+// JWT Authentication for security
+app.use(authentication({ whitelist: ['/authentication'] }));
+
+// add req.body to Express
+app.use(json());
+app.use(urlencoded({ extended: false }));
+
 // Get routes
 app.use('/authentication', authRoutes);
+app.use('/users', userRoutes);
 app.use('/products', productRoutes);
-userRoutes(app);
+// app.use('/orders', orderRoutes);
 
 /// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  const err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+// app.use(function (req, res, next) {
+//   const err = new Error('Not Found');
+//   err.status = 404;
+//   next(err);
+// });
 
 /// error handlers
 
 // development error handler
 // will print stacktrace
-app.use(function (err, req, res, next) {
-  console.log(err.stack);
+app.use(function (error, req, res, next) {
+  console.log(error.stack);
 
-  res.status(err.status || 500);
+  res.status(error.status || 500);
 
   res.json({
     errors: {
-      message: err.message,
-      error: err,
+      message: error.message,
+      error: error.stack,
     },
   });
 });

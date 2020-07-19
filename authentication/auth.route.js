@@ -7,14 +7,15 @@ import { authenticate } from './auth.service';
  */
 const router = Router();
 
-router.post('/authentication', isValidForCreation, (req, res, next) => {
-  authenticate(req.body)
-    .then((data) => res.status(200).send(data))
-    .catch((error) =>
-      res.status(500).send({
-        error: error.message,
-      })
-    );
+router.post('/', isValidForCreation, async (req, res, next) => {
+  try {
+    const data = await authenticate(req.body);
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(500).send({
+      error: error.message,
+    });
+  }
 });
 
 export default router;
