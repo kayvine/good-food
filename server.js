@@ -52,9 +52,9 @@ app.use(function (error, req, res, next) {
   res.status(error.status || 500);
 
   res.json({
-    errors: {
-      message: error.message,
-      error: error.stack,
+    error: {
+      message: err.message,
+      status: err.status,
     },
   });
 });

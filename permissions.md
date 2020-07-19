@@ -63,6 +63,41 @@ export const authenticate = async ({ email, password }) => {
 };
 ```
 
+When user is logged in and makes a request, a Bearer token header is send with it.
+The permissions which are in the token get put on req.user
+
+```javascript
+// ...
+
+// verify token
+verify(token, SECRET, (err, decoded) => {
+  if (err) {
+    res.status(401).send({ message: 'token validation failed' });
+  } else {
+    req.user = decoded;
+    next();
+  }
+});
+
+// ...
+```
+
+## :heavy_check_mark: Validate
+
+Check if user has ownership or permission.
+
+```javascript
+export const isOwnerOrHasPermission = (permission) => async (req, res, next) => {
+  const id = req.params.id;
+  const resource = await fetchResource(id);
+  if (resource.createdBy !== req.user._id || !req.user.permissions.includes(permission)) {
+    res.status(401).send({ message: 'Does not have correct permissions' });
+  } else {
+    next();
+  }
+};
+```
+
 ## :beginner: More
 
 https://gist.github.com/facultymatt/6370903
